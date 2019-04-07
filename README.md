@@ -1,5 +1,5 @@
-# rfidpoweroptimization
-Algorithm for computing the optimal transmission powers in a synchronous queued RFID network
+# Optimal power stationary policies for synchronous queued RFID networks
+Algorithm for computing the optimal power policy in a synchronous queued RFID network
 
 This software computes the optimal transmission powers for a network of RFID readers where:
 
