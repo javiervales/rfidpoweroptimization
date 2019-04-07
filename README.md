@@ -11,3 +11,11 @@ the transmission power configuration to be used in the netwoek.
 
 The optimizer obtains a matrix P, where each row indicates a network transmission power configuration (the ith element of 
 the row is the transmission power to be set for the ith reader), and the probability distribution α to be used. 
+
+<h2> Examples </h2>
+
+Simple usage
+
+```matlab
+sol = anneal([],L,[0.2 0.2 0 0.2 0.2],[1 1 1 1 1],conf,0)
+```
