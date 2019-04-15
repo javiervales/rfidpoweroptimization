@@ -1,5 +1,9 @@
 function [b, sinr] = bip(P, L, t, conf)
-
+% function [b, sinr] = bip(P, L, t, conf)
+% This function returns the matrix B (Batch identification probabilities) and SINR
+% given the loss matrix L, the power configuuration vector P, the timeslot durantion t
+% and the RFID anti-collision configuration
+% 
 % P(m,1) dBm
 % L(m,m) dBm is a matrix of network losses
 % t is the time scheduled to transmit
@@ -33,7 +37,7 @@ sinr = 10*log10(sinr_linear);
 
 m=size(P);
 b = zeros(1,m(1));
-load('Bfiles.mat');
+load('B.mat');
 for i=1:m(1) 
     trail = strcat('_',num2str(conf(i).protocol),num2str(conf(i).traffic_type));
     conf(i).B = {strcat('B1',trail),strcat('B2',trail),strcat('B3',trail)};    
