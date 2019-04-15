@@ -14,10 +14,21 @@ the row is the transmission power to be set for the ith reader), and the probabi
 
 <h2> Examples </h2>
 
-Simple usage
+Simple usage, small network with m=5
 
 ```matlab
 load example1.mat % Load network setup for m=5 readers
+L, conf % Show configuration
+L = L + 30 - 30*eye(5) % Add transmit mask DRE additional gap
+amin = [0.2 0.2 0 0.2 0.2]; % Minimal traffic per reader
+v = [1 1 1 1 1]; % Readers to optimize
+sol = anneal([],L,amin,v,conf,0) % Run optimizer
+```
+
+Simple usage, large network with m=50
+
+```matlab
+load example2.mat % Load network setup for m=50 readers
 L, conf % Show configuration
 L = L + 30 - 30*eye(5) % Add transmit mask DRE additional gap
 amin = [0.2 0.2 0 0.2 0.2]; % Minimal traffic per reader
