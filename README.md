@@ -23,7 +23,8 @@ L = L + 30 - 30*eye(5) % Add transmit mask DRE additional gap
 amin = [0.2 0.2 0 0.2 0.2]; % Minimal traffic per reader
 v = [1 1 1 1 1]; % Readers to optimize
 sol = anneal([],L,amin,v,conf,0) % Run optimizer indepent power policy
-sol = anneal([],L,amin,v,conf,1) % Run optimizer onoff power policy
+solonoff = anneal([],L,amin,v,conf,1) % Run optimizer onoff power policy
+sol = anneal(solonoff,L,amin,v,conf,0) % Run optimizer indepent power policy starting with solonoff solution
 ```
 
 Simple usage, large network with m=50
