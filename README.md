@@ -17,5 +17,8 @@ the row is the transmission power to be set for the ith reader), and the probabi
 Simple usage
 
 ```matlab
+load example1.mat % Load network setup for m=5 readers
+L
+conf
 sol = anneal([],L,[0.2 0.2 0 0.2 0.2],[1 1 1 1 1],conf,0)
 ```
