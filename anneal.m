@@ -53,7 +53,7 @@ cambios = 0;
 while 1
 	countloop = 0;
 	while 1
-		P = actualizaP(sol);
+		P = updateP(sol);
 		if onoff 
 			potencia = Ptx(randi(length(sol.Ptx))); 
 			P(P>0) = potencia;
