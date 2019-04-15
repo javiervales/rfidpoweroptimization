@@ -19,6 +19,6 @@ Simple usage
 ```matlab
 load example1.mat % Load network setup for m=5 readers
 L, conf % Show configuration
-L = L + 30 - eye(5) % Add transmit mask DRE gap
+L = L + 30 - 30*eye(5) % Add transmit mask DRE additional gap
 sol = anneal([],L,[0.2 0.2 0 0.2 0.2],[1 1 1 1 1],conf,0) % Run optimizer
 ```
