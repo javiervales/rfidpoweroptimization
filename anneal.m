@@ -1,23 +1,27 @@
 function solglobal = anneal(solinit, L, a, v, conf, onoff)
-% L: matriz de perdidas de la red
-% a: vector de traficos por slot. Si NaN significa trafico no asignado
-% Busca el maximo trafico conjunto admisible en los N sin trafico asignado
+% function solglobal = anneal(solinit, L, a, v, conf, onoff)
+% Search for the best transmission power configurations and application probabilities
+% L: Loss matrix
+% a: minimal traffic per reader 
+% v: readers for joint traffic maximization
+% conf: configuration of the anti-collision protocol in each reader
+% onoff: use independent powers (0) or same power (1)
 
 global solglobal;
 
-% PARAMETROS EXTERNOS
+% External parameters
 rand('seed',1);
 N = size(L,1);
-a = a(:); % Columna
-v = v(:); % Columna
+a = a(:); % Column
+v = v(:); % Column
 
-% PARAMETROS INTERNOS
+% Internal parameters
 timeslot = 0.3; % s
 Ptx = 0:0.0025:1;  % W
 REPMAX = 100;
 LAGRANGEMENOR = 100000;
 
-% Inicializacion del annealing
+% Annealing initialization
 fmax = -1;
 rep = 0;
 cambios = 0;
@@ -25,7 +29,7 @@ KT = 5.0;
 delta = 1.0;
 prob = exp(-KT)
 
-% Buscamos solucion de arranque
+% Search for start solution, round robin correspond to identity matrix
 if ~isempty(solinit)
 	P = solinit.P;
 else
@@ -38,17 +42,18 @@ sol.Ptx = Ptx;
 sol.KT = KT;
 sol.prob= prob;
 sol.potencia = sum(sol.P'*sol.alfa);
-sol.fobj = sol.tasaobj-sol.potencia/LAGRANGEMENOR; % Buscamos soluciones con la menor potencia media añadiendo un lagrangiano menor
+% Add secondary goal of reducing joint transmission power 
+sol.fobj = sol.tasaobj-sol.potencia/LAGRANGEMENOR; 
 if isnan(sol.fobj) 
-	fprintf('No existe solucion feasible\n');
+	fprintf('Unfeasible problem\n');
 	solglobal = NaN;
 	return 
 end
 
 solglobal = sol;
-fprintf('Solucion inicial: %0.6f, %d\nComenzando annealing...\n', sol.fobj, size(sol.P,1));
+fprintf('Initial solution: %0.6f, %d\nStarting annealing...\n', sol.fobj, size(sol.P,1));
 
-% Ejecucion del annealing
+% Annealing running
 cambios = 0;
 while 1
 	countloop = 0;
@@ -59,19 +64,19 @@ while 1
 			P(P>0) = potencia;
 		end
 
-		% Resolvemos problema LP asociado
+		% Solve associated LP
 		solaux = solveLP(L, P, timeslot, a, v, conf);
 		solaux.fobj = solaux.tasaobj;
 		solaux.potencia = sum(solaux.P'*solaux.alfa);
-		solaux.fobj = solaux.tasaobj-solaux.potencia/LAGRANGEMENOR; % Buscamos soluciones con la menor potencia media añadiendo un lagrangiano menor
+		solaux.fobj = solaux.tasaobj-solaux.potencia/LAGRANGEMENOR; 
 
-		% Si la solucion es feasible salimos
+		% If feasible solution break
 		countloop = countloop + 1;
 		if ~isnan(solaux.fobj) break; end
 	end
 	fprintf('Sol updated: %0.6f %0.6f %d %d %d  \r', solaux.tasaobj, solaux.potencia, size(solaux.P,1), rep, countloop);
 
-	% Aceptamos la nueva solucion?
+	% Is solution accepted?
 	cambio = 0;
 	forzado = 0;
 	if solaux.fobj>sol.fobj 
@@ -88,20 +93,16 @@ while 1
 		sol.Ptx = Ptx;
 		sol.KT = KT;
 		sol.prob = prob;
-		fprintf('\t\t\t\t\t +Sol accepted, prob: %0.3f, cambios: %d, forzada: %d       ', prob, cambios, forzado)
+		fprintf('\t\t\t\t\t +Sol accepted, prob: %0.3f, changes: %d, forzed: %d       ', prob, cambios, forzado)
 		if solglobal.fobj < sol.fobj
 			solglobal = sol;
 			fprintf('[Sol global updated: %0.6f %d %d]\n', solglobal.fobj, size(sol.P,1), sum(sol.alfa>0));
-			%solglobal.P(solglobal.alfa>0,:)
-			%solglobal.tasas
-			%solglobal.alfa(solglobal.alfa>0,:)
-			%solglobal
 		else
-			fprintf('[NO global updated]\n');
+			fprintf('[No global updated]\n');
 		end
 	end
 
-	% Hemos terminado?
+	% Have we finish?
 	rep = rep + 1;
 	if rep==REPMAX || forzado
 		if cambios 
@@ -111,16 +112,16 @@ while 1
 			prob = exp(-KT)
 			cambios = 0;
 			if ~forzado 
-				fprintf('\nReseteada sol a solglobal\n');
-				sol = solglobal; % reseteamos tras un ciclo con cambios que no mejore la solglobal
+				fprintf('\nReset sol to solglobal\n');
+				sol = solglobal; % Reseting after a cycle without improvements in global solution 
 			end
 		else
-			fprintf('\nFinalizado con fobj: %0.3f %d\n', solglobal.fobj, size(solglobal.P,1));
+			fprintf('\nFinished with fobj: %0.3f %d\n', solglobal.fobj, size(solglobal.P,1));
 			mask = solglobal.alfa>0;
 			solglobal.P = solglobal.P(mask,:);
 			solglobal.B = solglobal.B(mask,:);
 			solglobal.alfa = solglobal.alfa(mask);
-			break % FIN DEL ANNEALING
+			break % End of annealing
 		end
 	end
 end
