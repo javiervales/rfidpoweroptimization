@@ -1,5 +1,6 @@
 # Optimal power stationary policies for synchronous queued RFID networks
 Algorithm for computing the optimal power policy in a synchronous queued RFID network
+(see paper <a href=https://ieeexplore.ieee.org/abstract/document/8783080>"Optimal power stationary policies for synchronous queued RFID networks"</a>)
 
 This software computes the optimal transmission powers for a network of RFID readers where:
 
